@@ -1,0 +1,18 @@
+{$SERVER_NAME:localhost} {
+    root * /app/public
+
+    # Encode responses with compression
+    encode zstd gzip
+
+    # Handle static files first
+    @static {
+        file
+        path *.ico *.css *.js *.gif *.jpg *.jpeg *.png *.svg *.woff *.woff2
+    }
+    handle @static {
+        file_server
+    }
+
+    # PHP handling for Laravel - FrankenPHP php_server
+    php_server
+}

@@ -1,0 +1,29 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Actions\Game;
+
+class SimulateGameAction
+{
+    private const WIN_PROBABILITY = 40;
+    private const WIN_MULTIPLIER = 1.5;
+
+    public function execute(float $betAmount): array
+    {
+        $isWin = random_int(1, 100) <= self::WIN_PROBABILITY;
+        
+        if ($isWin) {
+            $winnings = $betAmount * self::WIN_MULTIPLIER;
+            return [
+                'win' => true,
+                'amount' => $winnings
+            ];
+        }
+
+        return [
+            'win' => false,
+            'amount' => 0.00
+        ];
+    }
+}
