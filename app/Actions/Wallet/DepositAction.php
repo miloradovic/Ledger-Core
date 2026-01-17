@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Actions\Wallet;
 
-use App\Models\User;
 use App\Models\Transaction;
+use App\Models\User;
 use Illuminate\Support\Facades\DB;
 
 class DepositAction

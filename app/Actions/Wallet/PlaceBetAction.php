@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace App\Actions\Wallet;
 
 use App\Actions\Game\SimulateGameAction;
-use App\Models\User;
 use App\Models\Transaction;
-use Illuminate\Support\Facades\DB;
+use App\Models\User;
 use Exception;
+use Illuminate\Support\Facades\DB;
 
 class PlaceBetAction
 {

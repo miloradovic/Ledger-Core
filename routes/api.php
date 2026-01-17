@@ -1,7 +1,7 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\GameController;
+use Illuminate\Support\Facades\Route;
 
 Route::middleware('auth:sanctum')->group(static function (): void {
     Route::post('/spin', [GameController::class, 'spin']);
