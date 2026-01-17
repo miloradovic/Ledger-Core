@@ -72,7 +72,6 @@ return $config
         'php_unit_dedicate_assert_internal_type' => true,
         'php_unit_expectation' => true,
         'php_unit_fqcn_annotation' => true,
-        'php_unit_method_casing' => true,
         'php_unit_mock' => true,
         'php_unit_mock_short_will_return' => true,
         'php_unit_namespaced' => true,
@@ -103,7 +102,6 @@ return $config
         'no_useless_sprintf' => true,
         'regular_callable_call' => true,
         'single_line_throw' => true,
-        'use_arrow_functions' => true,
         'void_return' => true,
         // Type declarations and casts
         'cast_spaces' => true,

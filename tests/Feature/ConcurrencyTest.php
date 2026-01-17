@@ -44,7 +44,7 @@ class ConcurrencyTest extends TestCase
 
         // Check that the user's balance is less than or equal to 100.00 (accounting for possible wins)
         $user->refresh();
-        static::assertLessThanOrEqual(100.00, $user->balance);
+        static::assertLessThanOrEqual(100.0, (float) $user->balance);
 
         // Check that at least 5 transactions were created (bets + possible wins)
         $transactionCount = DB::table('transactions')->where('user_id', $user->id)->count();
@@ -110,7 +110,7 @@ class ConcurrencyTest extends TestCase
 
         // Balance should remain unchanged
         $user->refresh();
-        static::assertSame(5.00, $user->balance);
+        static::assertSame(5.0, (float) $user->balance);
 
         // No transaction should be created
         $this->assertDatabaseCount('transactions', 0);

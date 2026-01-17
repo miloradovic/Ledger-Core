@@ -37,8 +37,11 @@ class UserFactory extends Factory
      */
     public function unverified(): static
     {
-        return $this->state(static fn (array $attributes) => [
+        // Note: Using non-static closure to allow bindTo() for instance binding
+        $callback = fn (array $attributes) => [
             'email_verified_at' => null,
-        ]);
+        ];
+
+        return $this->state($callback);
     }
 }
