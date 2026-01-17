@@ -12,11 +12,17 @@ class Game extends Model
     protected $fillable = [
         'name',
         'min_bet',
-        'max_bet'
+        'max_bet',
     ];
 
-    protected $casts = [
-        'min_bet' => 'decimal:2',
-        'max_bet' => 'decimal:2'
-    ];
+    /**
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'min_bet' => 'decimal:2',
+            'max_bet' => 'decimal:2',
+        ];
+    }
 }

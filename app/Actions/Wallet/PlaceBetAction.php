@@ -14,8 +14,12 @@ class PlaceBetAction
 {
     public function __construct(
         private SimulateGameAction $simulateGameAction
-    ) {}
+    ) {
+    }
 
+    /**
+     * @return array<string, bool|float>
+     */
     public function execute(User $user, float $betAmount): array
     {
         return DB::transaction(function () use ($user, $betAmount): array {
@@ -32,7 +36,7 @@ class PlaceBetAction
                 'user_id' => $user->id,
                 'type' => 'bet',
                 'amount' => -$betAmount,
-                'balance_after' => $user->balance
+                'balance_after' => $user->balance,
             ]);
 
             $gameResult = $this->simulateGameAction->execute($betAmount);
@@ -47,20 +51,20 @@ class PlaceBetAction
                     'user_id' => $user->id,
                     'type' => 'win',
                     'amount' => $winnings,
-                    'balance_after' => $user->balance
+                    'balance_after' => $user->balance,
                 ]);
 
                 return [
                     'win' => true,
                     'winnings' => $winnings,
-                    'new_balance' => $user->balance
+                    'new_balance' => $user->balance,
                 ];
             }
 
             return [
                 'win' => false,
                 'winnings' => 0.00,
-                'new_balance' => $user->balance
+                'new_balance' => $user->balance,
             ];
         });
     }

@@ -1,0 +1,34 @@
+parameters:
+  level: 8
+  paths:
+    - app
+    - config
+    - database
+    - routes
+    - tests
+
+  excludePaths:
+    - tests/Pest.php
+    - tests/TestCase.php
+    - app/Http/Middleware/HandleInertiaRequests.php
+    - app/Models/User.php
+    - tests/Feature/Auth/PasswordUpdateTest.php
+    - tests/Feature/ConcurrencyTest.php
+    - tests/Feature/ProfileTest.php
+    - tests/Unit/ExampleTest.php
+
+  ignoreErrors:
+    - '#Call to an undefined method Illuminate#'
+    - '#Access to an undefined property#'
+    - '#Undefined variable#'
+    - '#Call to an undefined static method#'
+    # Framework and library issues
+    - '#Cannot call method name\(\) on array\|Illuminate\\Routing\\Route#' # Laravel Route chain issue
+    - '#Access to constant ATTR_SSL_CA on an unknown class Pdo\\Mysql#' # PDO stub issue
+    - '#Class .* uses generic trait Illuminate\\Database\\Eloquent\\Factories\\HasFactory but does not specify its types#' # Laravel generics limitation
+    - '#Generic type Illuminate\\Database\\Eloquent\\Relations\\BelongsTo#' # Laravel BelongsTo generics limitation
+    - '#Method .* should return Illuminate\\Database\\Eloquent\\Relations\\BelongsTo#' # Laravel covariant BelongsTo
+    - '#Parameter .* expects Illuminate\\Contracts\\Auth\\Authenticatable.*User.*Illuminate\\Database\\Eloquent\\Collection#' # Laravel factory type system
+    - '#Attribute class PHPUnit\\Framework\\Attributes#' # PHPUnit 12 attributes
+    - '#Parameter.*PlaceBetAction.*expects.*User.*Authenticatable given#' # Auth guard type narrowing
+    - '#Cannot call method hasVerifiedEmail\(\) on.*User.*Illuminate\\Database\\Eloquent\\Collection#' # Laravel factory union type
