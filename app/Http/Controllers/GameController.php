@@ -15,8 +15,8 @@ use Illuminate\Support\Facades\Auth;
 class GameController extends Controller
 {
     public function __construct(
-        private DepositAction $depositAction,
-        private PlaceBetAction $placeBetAction
+        private readonly DepositAction $depositAction,
+        private readonly PlaceBetAction $placeBetAction
     ) {
     }
 

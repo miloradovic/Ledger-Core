@@ -1,7 +1,7 @@
 grumphp:
   hooks:
     pre-commit:
-      enabled: false
+      enabled: true
       tasks:
         - phpstan
         - php_cs_fixer
@@ -27,4 +27,3 @@ grumphp:
       enabled: true
       triggered_by:
         - php
-

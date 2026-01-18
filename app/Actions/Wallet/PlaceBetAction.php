@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\DB;
 class PlaceBetAction
 {
     public function __construct(
-        private SimulateGameAction $simulateGameAction
+        private readonly SimulateGameAction $simulateGameAction
     ) {
     }
 

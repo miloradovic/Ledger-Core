@@ -6,8 +6,8 @@ namespace App\Actions\Game;
 
 class SimulateGameAction
 {
-    private const WIN_PROBABILITY = 40;
-    private const WIN_MULTIPLIER = 1.5;
+    private const int WIN_PROBABILITY = 40;
+    private const float WIN_MULTIPLIER = 1.5;
 
     /**
      * @return array<string, bool|float>
