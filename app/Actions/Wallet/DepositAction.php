@@ -16,7 +16,7 @@ class DepositAction
     public function execute(User $user, float $amount): array
     {
         return DB::transaction(static function () use ($user, $amount): array {
-            $user = User::where('id', $user->id)->lockForUpdate()->first();
+            $user = User::where('id', $user->id)->lockForUpdate()->firstOrFail();
 
             $user->balance += $amount;
             $user->save();

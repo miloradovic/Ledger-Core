@@ -3,11 +3,9 @@
 namespace Tests\Feature\Auth;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use PHPUnit\Framework\Attributes\Internal;
 use PHPUnit\Framework\Attributes\Small;
 use Tests\TestCase;
 
-#[Internal]
 #[Small]
 class RegistrationTest extends TestCase
 {

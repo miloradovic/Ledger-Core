@@ -6,11 +6,9 @@ use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Facades\DB;
-use PHPUnit\Framework\Attributes\Internal;
 use PHPUnit\Framework\Attributes\Small;
 use Tests\TestCase;
 
-#[Internal]
 #[Small]
 class ConcurrencyTest extends TestCase
 {

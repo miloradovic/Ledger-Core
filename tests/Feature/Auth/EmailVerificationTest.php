@@ -7,11 +7,9 @@ use Illuminate\Auth\Events\Verified;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\URL;
-use PHPUnit\Framework\Attributes\Internal;
 use PHPUnit\Framework\Attributes\Small;
 use Tests\TestCase;
 
-#[Internal]
 #[Small]
 class EmailVerificationTest extends TestCase
 {
@@ -41,7 +39,9 @@ class EmailVerificationTest extends TestCase
         $response = $this->actingAs($user)->get($verificationUrl);
 
         Event::assertDispatched(Verified::class);
-        static::assertTrue($user->fresh()->hasVerifiedEmail());
+        $freshUser = $user->fresh();
+        static::assertNotNull($freshUser);
+        static::assertTrue($freshUser->hasVerifiedEmail());
         $response->assertRedirect(route('dashboard', absolute: false) . '?verified=1');
     }
 
@@ -57,6 +57,8 @@ class EmailVerificationTest extends TestCase
 
         $this->actingAs($user)->get($verificationUrl);
 
-        static::assertFalse($user->fresh()->hasVerifiedEmail());
+        $freshUser = $user->fresh();
+        static::assertNotNull($freshUser);
+        static::assertFalse($freshUser->hasVerifiedEmail());
     }
 }

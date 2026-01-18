@@ -23,7 +23,7 @@ class PlaceBetAction
     public function execute(User $user, float $betAmount): array
     {
         return DB::transaction(function () use ($user, $betAmount): array {
-            $user = User::where('id', $user->id)->lockForUpdate()->first();
+            $user = User::where('id', $user->id)->lockForUpdate()->firstOrFail();
 
             if ($user->balance < $betAmount) {
                 throw new Exception('Insufficient balance');

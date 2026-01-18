@@ -4,10 +4,8 @@ use App\Models\Transaction;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
-use PHPUnit\Framework\Attributes\Internal;
 use PHPUnit\Framework\Attributes\Small;
 
-#[Internal]
 #[Small]
 class PlaceBetTest extends BaseTestCase
 {

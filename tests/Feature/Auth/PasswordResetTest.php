@@ -6,11 +6,9 @@ use App\Models\User;
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Notification;
-use PHPUnit\Framework\Attributes\Internal;
 use PHPUnit\Framework\Attributes\Small;
 use Tests\TestCase;
 
-#[Internal]
 #[Small]
 class PasswordResetTest extends TestCase
 {
