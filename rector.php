@@ -6,7 +6,7 @@ use Rector\Config\RectorConfig;
 use Rector\Set\ValueObject\LevelSetList;
 
 return RectorConfig::configure()
-    ->withPhpVersion(\Rector\ValueObject\PhpVersion::PHP_83)
+    ->withPhpVersion(\Rector\ValueObject\PhpVersion::PHP_84)
     ->withPaths([
         __DIR__ . '/app',
         __DIR__ . '/config',
@@ -20,7 +20,7 @@ return RectorConfig::configure()
         __DIR__ . '/tests/TestCase.php',
     ])
     ->withSets([
-        LevelSetList::UP_TO_PHP_83,
+        LevelSetList::UP_TO_PHP_84,
     ])
     ->withRules([
     ]);

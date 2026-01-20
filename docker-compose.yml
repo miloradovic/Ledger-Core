@@ -1,5 +1,4 @@
 services:
-  # FrankenPHP Application - Development
   app:
     build:
       context: .
@@ -34,7 +33,6 @@ services:
       - "80:80"
       - "443:443"
 
-  # MySQL Database
   mysql:
     image: mysql:8.0
     container_name: ledger-core-mysql
@@ -56,12 +54,10 @@ services:
       retries: 3
       timeout: 5s
 
-# Docker Networks
 networks:
   ledger-network:
     driver: bridge
 
-# Docker Volumes
 volumes:
   mysql-data:
     driver: local

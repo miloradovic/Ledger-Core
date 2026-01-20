@@ -4,7 +4,7 @@
 # ============================================
 # DEVELOPMENT STAGE (FrankenPHP with full tools)
 # ============================================
-FROM dunglas/frankenphp:php8.3 AS development
+FROM dunglas/frankenphp:php8.4 AS development
 
 # Install system dependencies and PHP extensions in single layer
 RUN apt-get update && apt-get install -y \
