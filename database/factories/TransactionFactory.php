@@ -27,7 +27,7 @@ class TransactionFactory extends Factory
 
     public function deposit(float $amount = 100.00): static
     {
-        return $this->state(static fn (array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'type' => 'deposit',
             'amount' => $amount,
             'balance_after' => $amount,
@@ -36,7 +36,7 @@ class TransactionFactory extends Factory
 
     public function bet(float $amount = 10.00): static
     {
-        return $this->state(static fn (array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'type' => 'bet',
             'amount' => -$amount,
             'balance_after' => $attributes['balance_after'] - $amount,
@@ -45,7 +45,7 @@ class TransactionFactory extends Factory
 
     public function win(float $amount = 50.00): static
     {
-        return $this->state(static fn (array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'type' => 'win',
             'amount' => $amount,
             'balance_after' => $attributes['balance_after'] + $amount,

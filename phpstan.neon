@@ -20,6 +20,5 @@ parameters:
     - tests/Unit/ExampleTest.php
 
   ignoreErrors:
-    - '#Class .* uses generic trait Illuminate\\Database\\Eloquent\\Factories\\HasFactory but does not specify its types#' # Laravel generics limitation
     - '#Generic type Illuminate\\Database\\Eloquent\\Relations\\BelongsTo#' # Laravel BelongsTo generics limitation
     - '#Method .* should return Illuminate\\Database\\Eloquent\\Relations\\BelongsTo#' # Laravel covariant BelongsTo
