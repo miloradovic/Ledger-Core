@@ -20,6 +20,10 @@ RUN set -eux; \
     && docker-php-ext-install pdo_mysql zip bcmath mbstring exif pcntl \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
+RUN curl -fsSL https://deb.nodesource.com/setup_24.x | bash - \
+    && apt-get install -y nodejs \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
+
 # Copy Composer from official image
 COPY --from=composer:2.9 /usr/bin/composer /usr/bin/composer
 
@@ -36,6 +40,9 @@ COPY . .
 
 # Generate autoloader and run post-install scripts
 RUN composer dump-autoload --optimize
+
+# Install Node.js dependencies and build frontend assets
+RUN npm ci --legacy-peer-deps && npm run build
 
 # Set permissions
 RUN chown -R www-data:www-data /app/storage /app/bootstrap/cache \
