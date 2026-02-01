@@ -16,6 +16,7 @@ class UserSeeder extends Seeder
         // Create test user
         User::firstOrCreate([
             'email' => 'test@example.com',
+            'password' => bcrypt('password'),
         ], [
             'name' => 'Test User',
             'balance' => 5000.00,
@@ -24,6 +25,7 @@ class UserSeeder extends Seeder
         // Create admin user
         User::firstOrCreate([
             'email' => 'admin@example.com',
+            'password' => bcrypt('adminpassword'),
         ], [
             'name' => 'Admin User',
             'balance' => 10000.00,

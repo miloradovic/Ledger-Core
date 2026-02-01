@@ -20,4 +20,7 @@ Route::middleware('auth')->group(static function (): void {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
+// Health check endpoint used by Docker
+Route::get('/health', static fn () => response()->json(['status' => 'ok']));
+
 require __DIR__ . '/auth.php';
