@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ProfileUpdateRequest;
@@ -30,7 +32,8 @@ class ProfileController extends Controller
     public function update(ProfileUpdateRequest $request): RedirectResponse
     {
         $user = $request->user();
-        if (!$user) {
+
+        if (! $user) {
             return Redirect::route('login');
         }
 
@@ -55,7 +58,8 @@ class ProfileController extends Controller
         ]);
 
         $user = $request->user();
-        if (!$user) {
+
+        if (! $user) {
             return Redirect::route('login');
         }
 

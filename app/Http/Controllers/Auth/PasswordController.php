@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
@@ -16,7 +18,8 @@ class PasswordController extends Controller
     public function update(Request $request): RedirectResponse
     {
         $user = $request->user();
-        if (!$user) {
+
+        if (! $user) {
             return back();
         }
 

@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Log;
 class TransactionObserver
 {
     public function __construct(
-        private readonly Request $request
+        private readonly Request $request,
     ) {
     }
 

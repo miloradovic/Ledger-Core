@@ -1,11 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 use Knuckles\Scribe\Config\AuthIn;
-
-use function Knuckles\Scribe\Config\{configureStrategy, removeStrategies};
-
 use Knuckles\Scribe\Config\Defaults;
 use Knuckles\Scribe\Extracting\Strategies;
+
+use function Knuckles\Scribe\Config\configureStrategy;
+use function Knuckles\Scribe\Config\removeStrategies;
 
 // Only the most common configs are shown. See the https://scribe.knuckles.wtf/laravel/reference/config for all.
 
@@ -17,7 +19,7 @@ return [
     'description' => '',
 
     // Text to place in the "Introduction" section, right after the `description`. Markdown and HTML are supported.
-    'intro_text' => <<<INTRO
+    'intro_text' => <<<'INTRO'
         This documentation aims to provide all the information you need to work with our API.
 
         <aside>As you scroll, you'll see code examples for working with the API in different programming languages in the dark area to the right (or as part of the content on mobile).
@@ -239,8 +241,8 @@ return [
                 // Recommended: disable debug mode in response calls to avoid error stack traces in responses
                 config: [
                     'app.debug' => false,
-                ]
-            )
+                ],
+            ),
         ),
         'responseFields' => [
             ...Defaults::RESPONSE_FIELDS_STRATEGIES,

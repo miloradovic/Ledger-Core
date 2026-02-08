@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
@@ -17,7 +19,7 @@ class EmailVerificationPromptController extends Controller
     {
         $user = $request->user();
 
-        return !$user || $user->hasVerifiedEmail()
+        return ! $user || $user->hasVerifiedEmail()
                     ? redirect()->intended(route('dashboard', absolute: false))
                     : Inertia::render('Auth/VerifyEmail', ['status' => session('status')]);
     }

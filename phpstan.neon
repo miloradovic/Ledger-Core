@@ -12,13 +12,6 @@ parameters:
 
   excludePaths:
     - tests/Pest.php
-    - tests/TestCase.php
-    - app/Http/Middleware/HandleInertiaRequests.php
-    - tests/Feature/Auth/PasswordUpdateTest.php
-    - tests/Feature/ConcurrencyTest.php
-    - tests/Feature/ProfileTest.php
     - tests/Unit/ExampleTest.php
 
   ignoreErrors:
-    - '#Generic type Illuminate\\Database\\Eloquent\\Relations\\BelongsTo#' # Laravel BelongsTo generics limitation
-    - '#Method .* should return Illuminate\\Database\\Eloquent\\Relations\\BelongsTo#' # Laravel covariant BelongsTo

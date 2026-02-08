@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Tests\Feature\Auth;
 
 use App\Models\User;
@@ -33,7 +35,7 @@ class EmailVerificationTest extends TestCase
         $verificationUrl = URL::temporarySignedRoute(
             'verification.verify',
             now()->addMinutes(60),
-            ['id' => $user->id, 'hash' => sha1((string) $user->email)]
+            ['id' => $user->id, 'hash' => sha1((string) $user->email)],
         );
 
         $response = $this->actingAs($user)->get($verificationUrl);
@@ -52,7 +54,7 @@ class EmailVerificationTest extends TestCase
         $verificationUrl = URL::temporarySignedRoute(
             'verification.verify',
             now()->addMinutes(60),
-            ['id' => $user->id, 'hash' => sha1('wrong-email')]
+            ['id' => $user->id, 'hash' => sha1('wrong-email')],
         );
 
         $this->actingAs($user)->get($verificationUrl);

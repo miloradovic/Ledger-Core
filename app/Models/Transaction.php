@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Models;
 
 use Database\Factories\TransactionFactory;
@@ -31,7 +33,7 @@ class Transaction extends Model
     }
 
     /**
-     * @return BelongsTo<User>
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<User, $this>
      */
     public function user(): BelongsTo
     {

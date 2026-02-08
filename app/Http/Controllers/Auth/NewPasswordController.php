@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
@@ -52,7 +54,7 @@ class NewPasswordController extends Controller
                 ])->save();
 
                 event(new PasswordReset($user));
-            }
+            },
         );
 
         // If the password was successfully reset, we will redirect the user back to
@@ -62,6 +64,6 @@ class NewPasswordController extends Controller
             return redirect()->route('login')->with('status', __($status));
         }
 
-        throw ValidationException::withMessages([ 'email' => [trans($status)]]);
+        throw ValidationException::withMessages(['email' => [trans($status)]]);
     }
 }

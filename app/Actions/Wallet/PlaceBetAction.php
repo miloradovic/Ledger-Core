@@ -7,7 +7,6 @@ namespace App\Actions\Wallet;
 use App\Actions\Game\SimulateGameAction;
 use App\Models\Transaction;
 use App\Models\User;
-use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -16,7 +15,7 @@ class PlaceBetAction
 {
     public function __construct(
         private readonly SimulateGameAction $simulateGameAction,
-        private readonly Request $request
+        private readonly Request $request,
     ) {
     }
 
@@ -38,7 +37,7 @@ class PlaceBetAction
                     'session_id' => $this->request->hasSession() ? $this->request->session()->getId() : null,
                 ]);
 
-                throw new Exception('Insufficient balance');
+                throw new \Exception('Insufficient balance');
             }
 
             $user->balance -= $betAmount;

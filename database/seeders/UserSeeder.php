@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Database\Seeders;
 
 use App\Models\Transaction;
@@ -49,6 +51,7 @@ class UserSeeder extends Seeder
 
             // Generate random transactions
             $transactionCount = fake()->numberBetween(1, 20);
+
             for ($i = 0; $i < $transactionCount; $i++) {
                 $transactionType = fake()->randomElement(['bet', 'win']);
                 $currentBalance = $user->balance;

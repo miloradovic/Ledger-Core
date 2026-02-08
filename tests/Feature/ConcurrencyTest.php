@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Tests\Feature;
 
 use App\Models\User;
@@ -25,7 +27,7 @@ class ConcurrencyTest extends TestCase
         $requests = [];
 
         // Create 5 concurrent bet requests (each for 10.00)
-        for ($i = 0; $i < 5; ++$i) {
+        for ($i = 0; $i < 5; $i++) {
             $requests[] = ['bet_amount' => 10.00];
         }
 
