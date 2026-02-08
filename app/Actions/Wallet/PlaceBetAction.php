@@ -8,12 +8,15 @@ use App\Actions\Game\SimulateGameAction;
 use App\Models\Transaction;
 use App\Models\User;
 use Exception;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class PlaceBetAction
 {
     public function __construct(
-        private readonly SimulateGameAction $simulateGameAction
+        private readonly SimulateGameAction $simulateGameAction,
+        private readonly Request $request
     ) {
     }
 
@@ -26,6 +29,15 @@ class PlaceBetAction
             $user = User::where('id', $user->id)->lockForUpdate()->firstOrFail();
 
             if ($user->balance < $betAmount) {
+                Log::channel('transactions')->warning('Insufficient balance for bet', [
+                    'event' => 'bet_rejected',
+                    'user_id' => $user->id,
+                    'requested_amount' => $betAmount,
+                    'available_balance' => $user->balance,
+                    'ip' => $this->request->ip(),
+                    'session_id' => $this->request->hasSession() ? $this->request->session()->getId() : null,
+                ]);
+
                 throw new Exception('Insufficient balance');
             }
 
