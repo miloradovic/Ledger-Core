@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Http\Controllers\HealthController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
@@ -22,7 +23,8 @@ Route::middleware('auth')->group(static function (): void {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-// Health check endpoint used by Docker
-Route::get('/health', static fn () => response()->json(['status' => 'ok']));
+// Health check endpoints for Docker/monitoring
+Route::get('/health', [HealthController::class, 'ping']);
+Route::get('/health/check', [HealthController::class, 'check']);
 
 require __DIR__ . '/auth.php';

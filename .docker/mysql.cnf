@@ -1,0 +1,46 @@
+# MySQL 8.4 Performance Configuration for Laravel
+# Optimized for MINIMAL resource usage in development (~50-100MB)
+
+[mysqld]
+# InnoDB Settings (Minimal Memory)
+innodb_buffer_pool_size = 32M
+innodb_log_file_size = 16M
+innodb_log_buffer_size = 2M
+innodb_flush_log_at_trx_commit = 2
+innodb_flush_method = O_DIRECT
+innodb_file_per_table = 1
+
+# Disable Performance Schema (saves ~100MB)
+performance_schema = OFF
+
+# Connection Settings (Development - Low Concurrency)
+max_connections = 20
+max_connect_errors = 50
+connect_timeout = 10
+wait_timeout = 300
+interactive_timeout = 300
+
+# Buffer Settings (Minimal)
+sort_buffer_size = 256K
+read_buffer_size = 256K
+read_rnd_buffer_size = 512K
+join_buffer_size = 256K
+
+# Table Settings (Reduced)
+table_open_cache = 64
+table_definition_cache = 64
+
+# Temporary Tables (Minimal)
+tmp_table_size = 8M
+max_heap_table_size = 8M
+
+# Logging (minimal in production)
+slow_query_log = 0
+long_query_time = 2
+
+# Character Set
+character_set_server = utf8mb4
+collation_server = utf8mb4_unicode_ci
+
+# Binary Logging (disable for dev, enable for production)
+skip-log-bin

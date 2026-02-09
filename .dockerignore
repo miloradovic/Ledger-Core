@@ -1,0 +1,82 @@
+# Git and version control
+.git
+.gitignore
+.gitattributes
+
+# Environment and secrets
+.env
+.env.*
+!.env.example
+
+# Dependencies (will be installed in container)
+/node_modules
+/vendor
+
+# Build outputs and caches
+/public/hot
+/public/storage
+/storage/*.key
+/bootstrap/cache/*
+/public/build
+
+# Testing and development
+/tests
+/.phpunit.cache
+.phpunit.result.cache
+phpunit.xml
+/.pest
+
+# IDE and editor files
+.idea
+.vscode
+*.swp
+*.swo
+*~
+.DS_Store
+
+# CI/CD
+.github
+.gitlab-ci.yml
+.travis.yml
+
+# Documentation
+README.md
+AGENTS.md
+/docs
+
+# Docker files
+Dockerfile
+docker-compose*.yml
+
+# Build tools config
+webpack.mix.js
+vite.config.js
+tailwind.config.js
+postcss.config.js
+jsconfig.json
+
+# Static analysis and quality tools
+phpstan.neon
+rector.php
+grumphp.yml
+.php-cs-fixer.php
+.php-cs-fixer.cache
+
+# Logs and temporary files
+*.log
+/storage/logs/*
+/storage/framework/cache/*
+/storage/framework/sessions/*
+/storage/framework/testing/*
+/storage/framework/views/*
+
+# Package manager files
+package-lock.json
+composer.lock
+yarn.lock
+pnpm-lock.yaml
+
+# Misc
+artisan
+*.md
+!README.md

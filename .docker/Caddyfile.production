@@ -1,0 +1,105 @@
+# =============================================================================
+# Optimized Production Caddyfile for FrankenPHP + Laravel 12
+# Security hardened, performance optimized
+# =============================================================================
+
+{
+    # Global options
+    admin off
+    auto_https off
+    
+    # Logging
+    log {
+        output file /app/storage/logs/caddy.log
+        level ERROR
+    }
+}
+
+{$SERVER_NAME:localhost} {
+    root * /app/public
+
+    # Security headers
+    header {
+        # Prevent clickjacking
+        X-Frame-Options "SAMEORIGIN"
+        
+        # Prevent MIME sniffing
+        X-Content-Type-Options "nosniff"
+        
+        # XSS protection
+        X-XSS-Protection "1; mode=block"
+        
+        # Referrer policy
+        Referrer-Policy "strict-origin-when-cross-origin"
+        
+        # Content Security Policy (adjust for your app)
+        Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self'; frame-ancestors 'self';"
+        
+        # Remove server header
+        -Server
+        -X-Powered-By
+    }
+
+    # Compression (Brotli preferred, fallback to gzip)
+    encode zstd gzip
+
+    # Rate limiting (adjust as needed)
+    @api {
+        path /api/*
+    }
+    route @api {
+        # Add rate limiting middleware here if using Caddy plugin
+    }
+
+    # Static file handling with aggressive caching
+    @static {
+        file
+        path *.ico *.css *.js *.gif *.jpg *.jpeg *.png *.svg *.woff *.woff2 *.ttf *.eot *.webp *.webm *.mp4
+    }
+    handle @static {
+        header Cache-Control "public, max-age=31536000, immutable"
+        header Vary "Accept-Encoding"
+        file_server {
+            precompressed br gzip
+        }
+    }
+
+    # Versioned assets (build directory)
+    @versioned {
+        path /build/*
+    }
+    handle @versioned {
+        header Cache-Control "public, max-age=31536000, immutable"
+        file_server
+    }
+
+    # Deny access to sensitive files
+    @forbidden {
+        path *.env* *.log .git/* *.md /storage/* /config/* /database/* /tests/*
+    }
+    handle @forbidden {
+        respond 404
+    }
+
+    # PHP handling - FrankenPHP worker mode for ultimate performance
+    php_server {
+        # Worker mode (keep Laravel booted in memory)
+        worker /app/public/index.php
+        
+        # Number of workers (adjust based on CPU cores)
+        worker_count {$FRANKENPHP_WORKERS:4}
+        
+        # Request timeout
+        request_timeout 30s
+        
+        # Resolve root symlinks for proper path resolution
+        resolve_root_symlink
+    }
+
+    # Logging (errors only in production)
+    log {
+        output file /app/storage/logs/access.log
+        format json
+        level ERROR
+    }
+}

@@ -1,14 +1,158 @@
-# Multi-stage Dockerfile for Laravel application with FrankenPHP
-# Unified FrankenPHP setup for both development and production
+# =============================================================================
+# Highly Optimized Multi-Stage Dockerfile for Laravel 12 + FrankenPHP
+# Optimizations: Build speed, Security, Disk space, Runtime performance
+# =============================================================================
 
-# ============================================
-# DEVELOPMENT STAGE (FrankenPHP with full tools)
-# ============================================
+# -----------------------------------------------------------------------------
+# BASE: Common dependencies for all stages
+# -----------------------------------------------------------------------------
+FROM dunglas/frankenphp:php8.4-alpine AS base
+
+# Install only runtime dependencies
+RUN apk add --no-cache \
+    libzip \
+    libpng \
+    libxml2 \
+    oniguruma \
+    icu-libs \
+    && rm -rf /var/cache/apk/*
+
+# Install PHP extensions (one-time build)
+RUN apk add --no-cache --virtual .build-deps \
+    libzip-dev \
+    libpng-dev \
+    libxml2-dev \
+    oniguruma-dev \
+    icu-dev \
+    linux-headers \
+    && docker-php-ext-install -j$(nproc) \
+        pdo_mysql \
+        zip \
+        bcmath \
+        mbstring \
+        exif \
+        pcntl \
+        intl \
+        opcache \
+    && apk del .build-deps \
+    && rm -rf /tmp/* /var/cache/apk/*
+
+WORKDIR /app
+
+# -----------------------------------------------------------------------------
+# COMPOSER DEPENDENCIES: Cached layer for PHP dependencies
+# -----------------------------------------------------------------------------
+FROM base AS composer-deps
+
+# Install Composer from official image
+COPY --from=composer:2.9 /usr/bin/composer /usr/bin/composer
+
+# Copy only dependency files first (better caching)
+COPY composer.json composer.lock ./
+
+# Install dependencies with optimal flags and cache mounting
+RUN --mount=type=cache,target=/root/.composer,sharing=locked \
+    composer install \
+        --no-dev \
+        --no-scripts \
+        --no-autoloader \
+        --no-interaction \
+        --no-progress \
+        --prefer-dist \
+        --optimize-autoloader
+
+# -----------------------------------------------------------------------------
+# NODE BUILD: Build frontend assets
+# -----------------------------------------------------------------------------
+FROM node:24-alpine AS node-builder
+
+WORKDIR /app
+
+# Copy package files
+COPY package.json package-lock.json ./
+
+# Install node dependencies with cache
+RUN --mount=type=cache,target=/root/.npm,sharing=locked \
+    npm ci --legacy-peer-deps --no-audit --prefer-offline
+
+# Copy only necessary source files for building
+COPY resources ./resources
+COPY public ./public
+COPY vite.config.js postcss.config.js tailwind.config.js jsconfig.json ./
+
+# Build production assets
+RUN npm run build && \
+    rm -rf node_modules
+
+# -----------------------------------------------------------------------------
+# PRODUCTION: Minimal runtime image
+# -----------------------------------------------------------------------------
+FROM base AS production
+
+# Copy Composer dependencies
+COPY --from=composer-deps --chown=www-data:www-data /app/vendor /app/vendor
+
+# Copy application code (excluding what's in .dockerignore)
+COPY --chown=www-data:www-data ./app /app/app
+COPY --chown=www-data:www-data ./bootstrap /app/bootstrap
+COPY --chown=www-data:www-data ./config /app/config
+COPY --chown=www-data:www-data ./database/migrations /app/database/migrations
+COPY --chown=www-data:www-data ./database/factories /app/database/factories
+COPY --chown=www-data:www-data ./database/seeders /app/database/seeders
+COPY --chown=www-data:www-data ./public /app/public
+COPY --chown=www-data:www-data ./resources/views /app/resources/views
+COPY --chown=www-data:www-data ./routes /app/routes
+COPY --chown=www-data:www-data ./storage /app/storage
+COPY --chown=www-data:www-data ./artisan /app/artisan
+COPY --chown=www-data:www-data ./composer.json ./composer.lock /app/
+
+# Copy built frontend assets
+COPY --from=node-builder --chown=www-data:www-data /app/public/build /app/public/build
+
+# Generate optimized autoloader
+RUN composer dump-autoload --optimize --classmap-authoritative --no-dev
+
+# Create necessary directories and set permissions (security hardened)
+RUN mkdir -p storage/framework/{sessions,views,cache} \
+    storage/logs \
+    bootstrap/cache \
+    && chown -R www-data:www-data storage bootstrap/cache \
+    && chmod -R 775 storage bootstrap/cache \
+    && find storage -type f -exec chmod 664 {} \; \
+    && find storage -type d -exec chmod 775 {} \;
+
+# Production PHP configuration
+COPY .docker/php.production.ini /usr/local/etc/php/conf.d/zzz-custom.ini
+
+# Production Caddyfile
+COPY .docker/Caddyfile.production /etc/caddy/Caddyfile
+
+# Switch to non-root user (security)
+USER www-data
+
+# Production environment defaults
+ENV APP_ENV=production \
+    APP_DEBUG=false \
+    LOG_CHANNEL=stack \
+    LOG_LEVEL=error \
+    SERVER_NAME=":80"
+
+# Health check (optimized)
+HEALTHCHECK --interval=30s --timeout=3s --start-period=40s --retries=3 \
+    CMD ["frankenphp", "php-cli", "/app/artisan", "health:ping"]
+
+EXPOSE 80 443
+
+# Start FrankenPHP
+CMD ["frankenphp", "run", "--config", "/etc/caddy/Caddyfile"]
+
+# -----------------------------------------------------------------------------
+# DEVELOPMENT: Full tooling for local development
+# -----------------------------------------------------------------------------
 FROM dunglas/frankenphp:php8.4 AS development
 
-# Install system dependencies and PHP extensions in single layer
-RUN set -eux; \
-    apt-get update && apt-get install -y --no-install-recommends \
+# Install dev dependencies and tools
+RUN apt-get update && apt-get install -y --no-install-recommends \
     git \
     curl \
     unzip \
@@ -16,100 +160,34 @@ RUN set -eux; \
     libpng-dev \
     libonig-dev \
     libxml2-dev \
-    zip \
-    && docker-php-ext-install pdo_mysql zip bcmath mbstring exif pcntl \
-    && apt-get clean && rm -rf /var/lib/apt/lists/*
+    libicu-dev \
+    vim \
+    && curl -fsSL https://deb.nodesource.com/setup_24.x | bash - \
+    && apt-get install -y --no-install-recommends nodejs \
+    && docker-php-ext-install -j$(nproc) pdo_mysql zip bcmath mbstring exif pcntl intl opcache \
+    && pecl install xdebug-3.4.0 \
+    && docker-php-ext-enable xdebug \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-RUN curl -fsSL https://deb.nodesource.com/setup_24.x | bash - \
-    && apt-get install -y nodejs \
-    && apt-get clean && rm -rf /var/lib/apt/lists/*
-
-# Copy Composer from official image
+# Install Composer
 COPY --from=composer:2.9 /usr/bin/composer /usr/bin/composer
 
 WORKDIR /app
 
-# Copy composer files first for better caching
-COPY composer.json composer.lock ./
+# Development PHP configuration
+COPY .docker/php.development.ini /usr/local/etc/php/conf.d/zzz-custom.ini
 
-# Install PHP dependencies (uses BuildKit cache - enable DOCKER_BUILDKIT=1)
-RUN --mount=type=cache,target=/root/.composer composer install --prefer-dist --no-scripts --no-autoloader --no-interaction --no-progress
+# Development Caddyfile
+COPY .docker/Caddyfile /etc/frankenphp/Caddyfile
 
-# Copy application files
-COPY . .
+# Development environment defaults
+ENV APP_ENV=local \
+    APP_DEBUG=true \
+    LOG_LEVEL=debug \
+    SERVER_NAME=":80"
 
-# Generate autoloader and run post-install scripts
-RUN composer dump-autoload --optimize
+# Don't switch user in dev for easier file permissions
+EXPOSE 80 443
 
-# Install Node.js dependencies and build frontend assets
-RUN npm ci --legacy-peer-deps && npm run build
-
-# Set permissions
-RUN chown -R www-data:www-data /app/storage /app/bootstrap/cache \
-    && chmod -R 775 /app/storage /app/bootstrap/cache
-
-# Configure FrankenPHP for development
-ENV SERVER_NAME=":80"
-ENV APP_ENV=local
-ENV APP_DEBUG=true
-
-# ============================================
-# BUILDER STAGE (for production assets)
-# ============================================
-FROM development AS builder
-
-# Install Node.js for building assets (single layer, no recommends)
-RUN set -eux; \
-    curl -fsSL https://deb.nodesource.com/setup_24.x | bash - \
-    && apt-get update && apt-get install -y --no-install-recommends nodejs \
-    && rm -rf /var/lib/apt/lists/*
-
-# Copy package files first and install Node dependencies using cache
-COPY package.json package-lock.json ./
-RUN --mount=type=cache,target=/root/.npm npm ci --legacy-peer-deps --no-audit --prefer-offline && npm run build
-
-# Reinstall Composer dependencies without dev packages for production (uses cache)
-RUN --mount=type=cache,target=/root/.composer composer install --no-dev --prefer-dist --optimize-autoloader --no-scripts --no-interaction --no-progress
-
-# ============================================
-# PRODUCTION STAGE (FrankenPHP optimized)
-# ============================================
-FROM dunglas/frankenphp:php8.4-alpine AS production
-
-# Install runtime dependencies and PHP extensions
-RUN apk add --no-cache libzip libpng libxml2 oniguruma \
-    && apk add --no-cache --virtual .build-deps libzip-dev libpng-dev libxml2-dev oniguruma-dev \
-    && docker-php-ext-install pdo_mysql zip bcmath mbstring exif pcntl \
-    && apk del .build-deps
-
-WORKDIR /app
-
-# Copy only necessary files from builder (excluding node_modules, tests, etc.) and set correct ownership
-COPY --from=builder --chown=www-data:www-data /app/app /app/app
-COPY --from=builder --chown=www-data:www-data /app/bootstrap /app/bootstrap
-COPY --from=builder --chown=www-data:www-data /app/config /app/config
-COPY --from=builder --chown=www-data:www-data /app/database /app/database
-COPY --from=builder --chown=www-data:www-data /app/public /app/public
-COPY --from=builder --chown=www-data:www-data /app/resources/views /app/resources/views
-COPY --from=builder --chown=www-data:www-data /app/routes /app/routes
-COPY --from=builder --chown=www-data:www-data /app/storage /app/storage
-COPY --from=builder --chown=www-data:www-data /app/vendor /app/vendor
-COPY --from=builder --chown=www-data:www-data /app/artisan /app/artisan
-COPY --from=builder --chown=www-data:www-data /app/composer.json /app/composer.json
-
-# Set permissions
-RUN chown -R www-data:www-data /app/storage /app/bootstrap/cache \
-    && chmod -R 775 /app/storage /app/bootstrap/cache
-
-# Run as non-root for better security
-USER www-data
-
-# Configure FrankenPHP for production
-ENV SERVER_NAME=":80"
-ENV APP_ENV=production
-ENV APP_DEBUG=false
-
-EXPOSE 80
-
-# Start FrankenPHP server
-CMD ["frankenphp", "run", "--config", "/etc/caddy/Caddyfile"]
+CMD ["frankenphp", "run", "--config", "/etc/frankenphp/Caddyfile"]
