@@ -26,10 +26,10 @@ services:
     # Selective volume mounts (much faster than full app mount, especially on Windows)
     volumes:
       # Root files (composer, artisan, etc.)
-      - ./composer.json:/app/composer.json:ro
-      - ./composer.lock:/app/composer.lock:ro
+      - ./composer.json:/app/composer.json
+      - ./composer.lock:/app/composer.lock
       - ./artisan:/app/artisan:ro
-      - ./package.json:/app/package.json:ro
+      - ./package.json:/app/package.json
       - ./package-lock.json:/app/package-lock.json
       - ./phpunit.xml:/app/phpunit.xml:ro
       - ./phpstan.neon:/app/phpstan.neon:ro
@@ -79,6 +79,11 @@ services:
       DB_HOST: mysql
       DB_PORT: 3306
       SERVER_NAME: ":80"
+      # Composer settings for Docker
+      COMPOSER_ALLOW_SUPERUSER: 1
+      COMPOSER_PROCESS_TIMEOUT: 600
+      COMPOSER_MEMORY_LIMIT: -1
+      COMPOSER_NO_INTERACTION: 1
     
     # Optimized health check (uses artisan command)
     healthcheck:

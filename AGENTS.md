@@ -11,6 +11,7 @@
   - `composer install`
   - `php artisan key:generate`
   - `php artisan migrate` (only if needed for the task)
+- App is running inside Docker container `ledger-core-app`.
 
 ## Coding Standards
 - Follow PSR-12 and Laravel conventions.
@@ -18,7 +19,6 @@
 - Use dependency injection and strict typing where possible.
 
 ## Testing
-- App is running inside Docker container `ledger-core-app`.
 - PHPUnit 12:
   - `php artisan test`
   - or `./vendor/bin/phpunit`
