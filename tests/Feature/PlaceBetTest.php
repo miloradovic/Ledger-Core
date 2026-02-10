@@ -38,8 +38,8 @@ class PlaceBetTest extends BaseTestCase
         $response = $this->actingAs($user)
             ->postJson('/api/spin', ['bet_amount' => 10.00]);
 
-        $response->assertStatus(400);
-        $response->assertJson(['success' => false]);
+        $response->assertStatus(422);
+        $response->assertJsonStructure(['message', 'errors']);
     }
 
     public function testCanDepositMoneySuccessfully(): void

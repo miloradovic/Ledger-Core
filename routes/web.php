@@ -8,14 +8,14 @@ use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
-Route::get('/', static fn () => Inertia::render('Welcome', [
+Route::get('/', static fn() => Inertia::render('Welcome', [
     'canLogin' => Route::has('login'),
     'canRegister' => Route::has('register'),
     'laravelVersion' => Application::VERSION,
     'phpVersion' => \PHP_VERSION,
 ]));
 
-Route::get('/dashboard', static fn () => Inertia::render('Dashboard'))->middleware(['auth', 'verified'])->name('dashboard');
+Route::get('/dashboard', static fn() => Inertia::render('Dashboard'))->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(static function (): void {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

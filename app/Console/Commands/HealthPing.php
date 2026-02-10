@@ -27,7 +27,7 @@ class HealthPing extends Command
     {
         // Quick check - just verify Laravel can bootstrap
         $this->info('OK');
-        
+
         return Command::SUCCESS;
     }
 }

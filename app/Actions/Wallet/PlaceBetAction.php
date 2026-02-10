@@ -16,8 +16,7 @@ class PlaceBetAction
     public function __construct(
         private readonly SimulateGameAction $simulateGameAction,
         private readonly Request $request,
-    ) {
-    }
+    ) {}
 
     /**
      * @return array<string, bool|float>

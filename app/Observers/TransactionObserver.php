@@ -12,8 +12,7 @@ class TransactionObserver
 {
     public function __construct(
         private readonly Request $request,
-    ) {
-    }
+    ) {}
 
     /**
      * Handle the Transaction "created" event.

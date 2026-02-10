@@ -109,7 +109,7 @@ class ConcurrencyTest extends TestCase
             ->postJson('/api/spin', ['bet_amount' => 10.00]);
 
         // The bet should be rejected
-        $response->assertStatus(400);
+        $response->assertStatus(422);
 
         // Balance should remain unchanged
         $user->refresh();

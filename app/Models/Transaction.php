@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Models;
 
 use Database\Factories\TransactionFactory;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -38,5 +39,29 @@ class Transaction extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    /**
+     * @param Builder<Transaction> $query
+     */
+    public function scopeBets(Builder $query): void
+    {
+        $query->where('type', 'bet');
+    }
+
+    /**
+     * @param Builder<Transaction> $query
+     */
+    public function scopeWins(Builder $query): void
+    {
+        $query->where('type', 'win');
+    }
+
+    /**
+     * @param Builder<Transaction> $query
+     */
+    public function scopeRecent(Builder $query, int $limit = 50): void
+    {
+        $query->latest()->limit($limit);
     }
 }
