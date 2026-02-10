@@ -9,13 +9,15 @@ use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
 use PHPUnit\Framework\Attributes\Small;
+use PHPUnit\Framework\Attributes\Test;
 
 #[Small]
 class PlaceBetTest extends BaseTestCase
 {
     use RefreshDatabase;
 
-    public function testCanPlaceABetSuccessfully(): void
+    #[Test]
+    public function canPlaceABetSuccessfully(): void
     {
         $user = User::factory()->create(['balance' => 100.00]);
 
@@ -31,7 +33,8 @@ class PlaceBetTest extends BaseTestCase
         ]);
     }
 
-    public function testPreventsBettingWithInsufficientBalance(): void
+    #[Test]
+    public function preventsBettingWithInsufficientBalance(): void
     {
         $user = User::factory()->create(['balance' => 5.00]);
 
@@ -42,7 +45,8 @@ class PlaceBetTest extends BaseTestCase
         $response->assertJsonStructure(['message', 'errors']);
     }
 
-    public function testCanDepositMoneySuccessfully(): void
+    #[Test]
+    public function canDepositMoneySuccessfully(): void
     {
         $user = User::factory()->create(['balance' => 50.00]);
 
@@ -59,7 +63,8 @@ class PlaceBetTest extends BaseTestCase
         ]);
     }
 
-    public function testCanGetUserBalance(): void
+    #[Test]
+    public function canGetUserBalance(): void
     {
         $user = User::factory()->create(['balance' => 75.50]);
 
@@ -70,7 +75,8 @@ class PlaceBetTest extends BaseTestCase
         $response->assertJson(['balance' => 75.50]);
     }
 
-    public function testCanGetTransactionHistory(): void
+    #[Test]
+    public function canGetTransactionHistory(): void
     {
         $user = User::factory()->create(['balance' => 100.00]);
 

@@ -8,6 +8,7 @@ use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
 use PHPUnit\Framework\Attributes\Small;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 #[Small]
@@ -15,7 +16,8 @@ class PasswordUpdateTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function testPasswordCanBeUpdated(): void
+    #[Test]
+    public function passwordCanBeUpdated(): void
     {
         $user = User::factory()->create();
 
@@ -35,7 +37,8 @@ class PasswordUpdateTest extends TestCase
         static::assertTrue(Hash::check('new-password', $user->refresh()->password));
     }
 
-    public function testCorrectPasswordMustBeProvidedToUpdatePassword(): void
+    #[Test]
+    public function correctPasswordMustBeProvidedToUpdatePassword(): void
     {
         $user = User::factory()->create();
 

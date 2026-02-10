@@ -7,6 +7,7 @@ namespace Tests\Feature\Auth;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Mail;
 use PHPUnit\Framework\Attributes\Small;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 #[Small]
@@ -14,14 +15,16 @@ class RegistrationTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function testRegistrationScreenCanBeRendered(): void
+    #[Test]
+    public function registrationScreenCanBeRendered(): void
     {
         $response = $this->get('/register');
 
         $response->assertStatus(200);
     }
 
-    public function testNewUsersCanRegister(): void
+    #[Test]
+    public function newUsersCanRegister(): void
     {
         Mail::fake();
 

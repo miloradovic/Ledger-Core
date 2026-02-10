@@ -9,6 +9,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Facades\DB;
 use PHPUnit\Framework\Attributes\Small;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 #[Small]
@@ -17,7 +18,8 @@ class ConcurrencyTest extends TestCase
     use RefreshDatabase;
     use WithFaker;
 
-    public function testConcurrentBetsAreHandledCorrectly(): void
+    #[Test]
+    public function concurrentBetsAreHandledCorrectly(): void
     {
         // Create a user with a specific balance
         $user = User::factory()->create(['balance' => 100.00]);
@@ -61,7 +63,8 @@ class ConcurrencyTest extends TestCase
         ]);
     }
 
-    public function testConcurrentBetsWithInsufficientFundsAreRejected(): void
+    #[Test]
+    public function concurrentBetsWithInsufficientFundsAreRejected(): void
     {
         // Create a user with limited balance
         $user = User::factory()->create(['balance' => 15.00]);
@@ -99,7 +102,8 @@ class ConcurrencyTest extends TestCase
         static::assertGreaterThanOrEqual(0.00, $user->balance);
     }
 
-    public function testBalanceNeverGoesNegative(): void
+    #[Test]
+    public function balanceNeverGoesNegative(): void
     {
         // Create a user with minimal balance
         $user = User::factory()->create(['balance' => 5.00]);

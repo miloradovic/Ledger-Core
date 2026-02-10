@@ -7,6 +7,7 @@ namespace Tests\Feature\Auth;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use PHPUnit\Framework\Attributes\Small;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 #[Small]
@@ -14,14 +15,16 @@ class AuthenticationTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function testLoginScreenCanBeRendered(): void
+    #[Test]
+    public function loginScreenCanBeRendered(): void
     {
         $response = $this->get('/login');
 
         $response->assertStatus(200);
     }
 
-    public function testUsersCanAuthenticateUsingTheLoginScreen(): void
+    #[Test]
+    public function usersCanAuthenticateUsingTheLoginScreen(): void
     {
         $user = User::factory()->create();
 
@@ -34,7 +37,8 @@ class AuthenticationTest extends TestCase
         $response->assertRedirect(route('dashboard', absolute: false));
     }
 
-    public function testUsersCanNotAuthenticateWithInvalidPassword(): void
+    #[Test]
+    public function usersCanNotAuthenticateWithInvalidPassword(): void
     {
         $user = User::factory()->create();
 
@@ -46,7 +50,8 @@ class AuthenticationTest extends TestCase
         $this->assertGuest();
     }
 
-    public function testUsersCanLogout(): void
+    #[Test]
+    public function usersCanLogout(): void
     {
         $user = User::factory()->create();
 
