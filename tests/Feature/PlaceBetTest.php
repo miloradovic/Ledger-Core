@@ -17,7 +17,7 @@ class PlaceBetTest extends BaseTestCase
     use RefreshDatabase;
 
     #[Test]
-    public function canPlaceABetSuccessfully(): void
+    public function can_place_a_bet_successfully(): void
     {
         $user = User::factory()->create(['balance' => 100.00]);
 
@@ -34,7 +34,7 @@ class PlaceBetTest extends BaseTestCase
     }
 
     #[Test]
-    public function preventsBettingWithInsufficientBalance(): void
+    public function prevents_betting_with_insufficient_balance(): void
     {
         $user = User::factory()->create(['balance' => 5.00]);
 
@@ -46,7 +46,7 @@ class PlaceBetTest extends BaseTestCase
     }
 
     #[Test]
-    public function canDepositMoneySuccessfully(): void
+    public function can_deposit_money_successfully(): void
     {
         $user = User::factory()->create(['balance' => 50.00]);
 
@@ -64,7 +64,7 @@ class PlaceBetTest extends BaseTestCase
     }
 
     #[Test]
-    public function canGetUserBalance(): void
+    public function can_get_user_balance(): void
     {
         $user = User::factory()->create(['balance' => 75.50]);
 
@@ -76,7 +76,7 @@ class PlaceBetTest extends BaseTestCase
     }
 
     #[Test]
-    public function canGetTransactionHistory(): void
+    public function can_get_transaction_history(): void
     {
         $user = User::factory()->create(['balance' => 100.00]);
 

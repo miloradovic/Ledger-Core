@@ -16,7 +16,7 @@ class RegistrationTest extends TestCase
     use RefreshDatabase;
 
     #[Test]
-    public function registrationScreenCanBeRendered(): void
+    public function registration_screen_can_be_rendered(): void
     {
         $response = $this->get('/register');
 
@@ -24,7 +24,7 @@ class RegistrationTest extends TestCase
     }
 
     #[Test]
-    public function newUsersCanRegister(): void
+    public function new_users_can_register(): void
     {
         Mail::fake();
 

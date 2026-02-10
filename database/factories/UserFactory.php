@@ -37,7 +37,7 @@ class UserFactory extends Factory
      */
     public function unverified(): static
     {
-        $callback = fn(array $attributes) => [
+        $callback = fn (array $attributes) => [
             'email_verified_at' => null,
         ];
 

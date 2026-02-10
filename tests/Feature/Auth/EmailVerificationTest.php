@@ -19,7 +19,7 @@ class EmailVerificationTest extends TestCase
     use RefreshDatabase;
 
     #[Test]
-    public function emailVerificationScreenCanBeRendered(): void
+    public function email_verification_screen_can_be_rendered(): void
     {
         $user = User::factory()->unverified()->create();
 
@@ -29,7 +29,7 @@ class EmailVerificationTest extends TestCase
     }
 
     #[Test]
-    public function emailCanBeVerified(): void
+    public function email_can_be_verified(): void
     {
         $user = User::factory()->unverified()->create();
 
@@ -47,11 +47,11 @@ class EmailVerificationTest extends TestCase
         $freshUser = $user->fresh();
         static::assertNotNull($freshUser);
         static::assertTrue($freshUser->hasVerifiedEmail());
-        $response->assertRedirect(route('dashboard', absolute: false) . '?verified=1');
+        $response->assertRedirect(route('dashboard', absolute: false).'?verified=1');
     }
 
     #[Test]
-    public function emailIsNotVerifiedWithInvalidHash(): void
+    public function email_is_not_verified_with_invalid_hash(): void
     {
         $user = User::factory()->unverified()->create();
 

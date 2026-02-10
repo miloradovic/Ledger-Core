@@ -11,7 +11,6 @@ use App\Http\Requests\PlaceBetRequest;
 use App\Http\Resources\BetResultResource;
 use App\Http\Resources\TransactionResource;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class GameController extends Controller

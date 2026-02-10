@@ -15,7 +15,7 @@ class ExampleTest extends TestCase
      * A basic test example.
      */
     #[Test]
-    public function thatTrueIsTrue(): void
+    public function that_true_is_true(): void
     {
         static::assertTrue(true);
     }

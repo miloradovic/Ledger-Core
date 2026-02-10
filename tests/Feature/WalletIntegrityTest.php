@@ -15,7 +15,7 @@ class WalletIntegrityTest extends TestCase
     use RefreshDatabase;
 
     #[Test]
-    public function balanceNeverGoesNegativeUnderConcurrentLoad(): void
+    public function balance_never_goes_negative_under_concurrent_load(): void
     {
         $user = User::factory()->create(['balance' => 100.00]);
 
@@ -41,7 +41,7 @@ class WalletIntegrityTest extends TestCase
     }
 
     #[Test]
-    public function transactionHistoryMatchesBalanceChanges(): void
+    public function transaction_history_matches_balance_changes(): void
     {
         $user = User::factory()->create(['balance' => 100.00]);
 
@@ -61,7 +61,7 @@ class WalletIntegrityTest extends TestCase
     }
 
     #[Test]
-    public function multipleDepositsAreAccurate(): void
+    public function multiple_deposits_are_accurate(): void
     {
         $user = User::factory()->create(['balance' => 0.00]);
 
@@ -78,7 +78,7 @@ class WalletIntegrityTest extends TestCase
     }
 
     #[Test]
-    public function insufficientBalanceRejectedCorrectly(): void
+    public function insufficient_balance_rejected_correctly(): void
     {
         $user = User::factory()->create(['balance' => 5.00]);
 
@@ -90,7 +90,7 @@ class WalletIntegrityTest extends TestCase
     }
 
     #[Test]
-    public function transactionRecordsContainCorrectBalanceAfter(): void
+    public function transaction_records_contain_correct_balance_after(): void
     {
         $user = User::factory()->create(['balance' => 100.00]);
 

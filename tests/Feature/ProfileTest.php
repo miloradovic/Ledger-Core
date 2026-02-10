@@ -16,7 +16,7 @@ class ProfileTest extends TestCase
     use RefreshDatabase;
 
     #[Test]
-    public function profilePageIsDisplayed(): void
+    public function profile_page_is_displayed(): void
     {
         $user = User::factory()->create();
 
@@ -28,7 +28,7 @@ class ProfileTest extends TestCase
     }
 
     #[Test]
-    public function profileInformationCanBeUpdated(): void
+    public function profile_information_can_be_updated(): void
     {
         $user = User::factory()->create();
 
@@ -51,7 +51,7 @@ class ProfileTest extends TestCase
     }
 
     #[Test]
-    public function emailVerificationStatusIsUnchangedWhenTheEmailAddressIsUnchanged(): void
+    public function email_verification_status_is_unchanged_when_the_email_address_is_unchanged(): void
     {
         $user = User::factory()->create();
 
@@ -70,7 +70,7 @@ class ProfileTest extends TestCase
     }
 
     #[Test]
-    public function userCanDeleteTheirAccount(): void
+    public function user_can_delete_their_account(): void
     {
         $user = User::factory()->create();
 
@@ -89,7 +89,7 @@ class ProfileTest extends TestCase
     }
 
     #[Test]
-    public function correctPasswordMustBeProvidedToDeleteAccount(): void
+    public function correct_password_must_be_provided_to_delete_account(): void
     {
         $user = User::factory()->create();
 

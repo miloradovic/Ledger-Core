@@ -19,7 +19,7 @@ class ConcurrencyTest extends TestCase
     use WithFaker;
 
     #[Test]
-    public function concurrentBetsAreHandledCorrectly(): void
+    public function concurrent_bets_are_handled_correctly(): void
     {
         // Create a user with a specific balance
         $user = User::factory()->create(['balance' => 100.00]);
@@ -64,7 +64,7 @@ class ConcurrencyTest extends TestCase
     }
 
     #[Test]
-    public function concurrentBetsWithInsufficientFundsAreRejected(): void
+    public function concurrent_bets_with_insufficient_funds_are_rejected(): void
     {
         // Create a user with limited balance
         $user = User::factory()->create(['balance' => 15.00]);
@@ -103,7 +103,7 @@ class ConcurrencyTest extends TestCase
     }
 
     #[Test]
-    public function balanceNeverGoesNegative(): void
+    public function balance_never_goes_negative(): void
     {
         // Create a user with minimal balance
         $user = User::factory()->create(['balance' => 5.00]);

@@ -42,7 +42,7 @@ class Transaction extends Model
     }
 
     /**
-     * @param Builder<Transaction> $query
+     * @param  Builder<Transaction>  $query
      */
     public function scopeBets(Builder $query): void
     {
@@ -50,7 +50,7 @@ class Transaction extends Model
     }
 
     /**
-     * @param Builder<Transaction> $query
+     * @param  Builder<Transaction>  $query
      */
     public function scopeWins(Builder $query): void
     {
@@ -58,7 +58,7 @@ class Transaction extends Model
     }
 
     /**
-     * @param Builder<Transaction> $query
+     * @param  Builder<Transaction>  $query
      */
     public function scopeRecent(Builder $query, int $limit = 50): void
     {

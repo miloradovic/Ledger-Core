@@ -17,7 +17,7 @@ class PasswordUpdateTest extends TestCase
     use RefreshDatabase;
 
     #[Test]
-    public function passwordCanBeUpdated(): void
+    public function password_can_be_updated(): void
     {
         $user = User::factory()->create();
 
@@ -38,7 +38,7 @@ class PasswordUpdateTest extends TestCase
     }
 
     #[Test]
-    public function correctPasswordMustBeProvidedToUpdatePassword(): void
+    public function correct_password_must_be_provided_to_update_password(): void
     {
         $user = User::factory()->create();
 

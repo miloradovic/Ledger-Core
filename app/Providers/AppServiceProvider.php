@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Providers;
 
 use App\Events\BetPlaced;
-use App\Events\BetWon;
 use App\Listeners\LogBetActivity;
 use App\Models\Transaction;
 use App\Observers\TransactionObserver;

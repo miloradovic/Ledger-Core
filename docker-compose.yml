@@ -33,6 +33,7 @@ services:
       - ./package-lock.json:/app/package-lock.json
       - ./phpunit.xml:/app/phpunit.xml:ro
       - ./phpstan.neon:/app/phpstan.neon:ro
+      - ./.env:/app/.env:ro
       
       # Application code (read-only where possible)
       - ./app:/app/app:delegated

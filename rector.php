@@ -15,12 +15,9 @@ return RectorConfig::configure()
         __DIR__.'/tests',
     ])
     ->withSkip([
-        __DIR__.'/app/Http/Middleware/HandleInertiaRequests.php',
         __DIR__.'/tests/Pest.php',
         __DIR__.'/tests/TestCase.php',
     ])
     ->withSets([
         LevelSetList::UP_TO_PHP_84,
-    ])
-    ->withRules([
     ]);

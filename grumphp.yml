@@ -1,29 +1,17 @@
 grumphp:
   hooks:
     pre-commit:
-      enabled: true
       tasks:
         - phpstan
-        - php_cs_fixer
+        - pint
         - pest
 
   tasks:
     phpstan:
-      enabled: true
-      level: 8
       configuration: phpstan.neon
       memory_limit: 256M
-      triggered_by:
-        - php
 
-    php_cs_fixer:
-      enabled: true
-      config: .php-cs-fixer.php
-      triggered_by:
-        - php
-      allow_risky: true
+    pint:
+      config: pint.json
 
     pest:
-      enabled: true
-      triggered_by:
-        - php
