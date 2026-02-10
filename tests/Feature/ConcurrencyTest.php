@@ -10,6 +10,7 @@ use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Facades\DB;
 use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\Attributes\Test;
+use Symfony\Component\HttpFoundation\Response;
 use Tests\TestCase;
 
 #[Small]
@@ -90,7 +91,7 @@ class ConcurrencyTest extends TestCase
 
         // The third request might succeed or fail depending on game results
         // If it fails due to insufficient funds, that's acceptable behavior
-        if ($responses[2]->status() === 400) {
+        if ($responses[2]->status() === Response::HTTP_UNPROCESSABLE_ENTITY) {
             // This is expected - insufficient funds after the first two bets
             static::assertStringContainsString('Insufficient balance', $responses[2]->json('message'));
         } else {

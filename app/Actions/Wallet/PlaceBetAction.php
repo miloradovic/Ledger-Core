@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Actions\Wallet;
 
 use App\Actions\Game\SimulateGameAction;
+use App\Exceptions\InsufficientBalanceException;
 use App\Models\Transaction;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -36,7 +37,10 @@ class PlaceBetAction
                     'session_id' => $this->request->hasSession() ? $this->request->session()->getId() : null,
                 ]);
 
-                throw new \Exception('Insufficient balance');
+                throw new InsufficientBalanceException(
+                    required: $betAmount,
+                    available: (float) $user->balance
+                );
             }
 
             $user->balance -= $betAmount;

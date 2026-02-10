@@ -6,6 +6,7 @@ namespace App\Http\Controllers;
 
 use App\Actions\Wallet\DepositAction;
 use App\Actions\Wallet\PlaceBetAction;
+use App\Exceptions\InsufficientBalanceException;
 use App\Http\Requests\DepositRequest;
 use App\Http\Requests\PlaceBetRequest;
 use App\Http\Resources\BetResultResource;
@@ -40,11 +41,13 @@ class GameController extends Controller
                 'success' => true,
                 'data' => $resource->toArray($request),
             ]);
+        } catch (InsufficientBalanceException $e) {
+            return $e->render();
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => $e->getMessage(),
-            ], 400);
+                'message' => 'An unexpected error occurred',
+            ], 500);
         }
     }
 
