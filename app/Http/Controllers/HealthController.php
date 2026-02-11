@@ -1,9 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
+use Symfony\Component\HttpFoundation\Response;
+use Throwable;
 
 class HealthController extends Controller
 {
@@ -12,7 +16,7 @@ class HealthController extends Controller
      */
     public function ping(): JsonResponse
     {
-        return response()->json(['status' => 'ok'], 200);
+        return response()->json(['status' => 'ok'], Response::HTTP_OK);
     }
 
     /**
@@ -29,11 +33,14 @@ class HealthController extends Controller
         try {
             DB::connection()->getPdo();
             $health['database'] = 'connected';
-        } catch (\Exception $e) {
+        } catch (Throwable $e) {
             $health['status'] = 'error';
             $health['database'] = 'disconnected';
         }
 
-        return response()->json($health, $health['status'] === 'ok' ? 200 : 503);
+        return response()->json(
+            $health,
+            $health['status'] === 'ok' ? Response::HTTP_OK : Response::HTTP_SERVICE_UNAVAILABLE
+        );
     }
 }
