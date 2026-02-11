@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Actions\Wallet;
 
 use App\Actions\Game\SimulateGameAction;
+use App\Enums\TransactionType;
 use App\Exceptions\InsufficientBalanceException;
 use App\Models\Transaction;
 use App\Models\User;
@@ -20,14 +21,15 @@ class PlaceBetAction
     ) {}
 
     /**
-     * @return array<string, bool|float>
+     * @param  numeric-string  $betAmount
+     * @return array<string, bool|string>
      */
-    public function execute(User $user, float $betAmount): array
+    public function execute(User $user, string $betAmount): array
     {
         return DB::transaction(function () use ($user, $betAmount): array {
             $user = User::where('id', $user->id)->lockForUpdate()->firstOrFail();
 
-            if ($user->balance < $betAmount) {
+            if (bccomp((string) $user->balance, $betAmount, 4) < 0) {
                 Log::channel('transactions')->warning('Insufficient balance for bet', [
                     'event' => 'bet_rejected',
                     'user_id' => $user->id,
@@ -39,18 +41,19 @@ class PlaceBetAction
 
                 throw new InsufficientBalanceException(
                     required: $betAmount,
-                    available: (float) $user->balance
+                    available: (string) $user->balance
                 );
             }
 
-            $user->balance -= $betAmount;
+            $newBalance = bcsub((string) $user->balance, $betAmount, 4);
+            $user->balance = $newBalance;
             $user->save();
 
             Transaction::create([
                 'user_id' => $user->id,
-                'type' => 'bet',
-                'amount' => -$betAmount,
-                'balance_after' => $user->balance,
+                'type' => TransactionType::Bet,
+                'amount' => bcsub('0', $betAmount, 4),
+                'balance_after' => $newBalance,
             ]);
 
             $gameResult = $this->simulateGameAction->execute($betAmount);
@@ -58,27 +61,28 @@ class PlaceBetAction
             if ($gameResult['win']) {
                 $winnings = $gameResult['amount'];
 
-                $user->balance += $winnings;
+                $winBalance = bcadd($newBalance, $winnings, 4);
+                $user->balance = $winBalance;
                 $user->save();
 
                 Transaction::create([
                     'user_id' => $user->id,
-                    'type' => 'win',
+                    'type' => TransactionType::Win,
                     'amount' => $winnings,
-                    'balance_after' => $user->balance,
+                    'balance_after' => $winBalance,
                 ]);
 
                 return [
                     'win' => true,
                     'winnings' => $winnings,
-                    'new_balance' => $user->balance,
+                    'new_balance' => $winBalance,
                 ];
             }
 
             return [
                 'win' => false,
-                'winnings' => 0.00,
-                'new_balance' => $user->balance,
+                'winnings' => '0.0000',
+                'new_balance' => $newBalance,
             ];
         });
     }

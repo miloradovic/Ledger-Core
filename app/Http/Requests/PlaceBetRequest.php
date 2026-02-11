@@ -25,7 +25,9 @@ class PlaceBetRequest extends FormRequest
                 'min:0.01',
                 'max:1000.00',
                 function ($attribute, $value, $fail) {
-                    if (auth()->user()?->balance < $value) {
+                    $balance = (string) (auth()->user()->balance ?? '0');
+                    $bet = number_format((float) $value, 4, '.', '');
+                    if (bccomp($balance, $bet, 4) < 0) {
                         $fail('Insufficient balance for this bet.');
                     }
                 },

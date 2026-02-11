@@ -33,7 +33,8 @@ class GameController extends Controller
         }
 
         try {
-            $result = $this->placeBetAction->execute($user, $request->validated('bet_amount'));
+            $betAmount = number_format((float) $request->validated('bet_amount'), 4, '.', '');
+            $result = $this->placeBetAction->execute($user, $betAmount);
 
             $resource = new BetResultResource($result);
 
@@ -62,7 +63,8 @@ class GameController extends Controller
             ], 401);
         }
 
-        $result = $this->depositAction->execute($user, $request->validated('amount'));
+        $depositAmount = number_format((float) $request->validated('amount'), 4, '.', '');
+        $result = $this->depositAction->execute($user, $depositAmount);
 
         return response()->json([
             'success' => true,

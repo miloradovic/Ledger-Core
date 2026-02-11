@@ -9,8 +9,8 @@ use Exception;
 class InsufficientBalanceException extends Exception
 {
     public function __construct(
-        public readonly float $required,
-        public readonly float $available
+        public readonly string $required,
+        public readonly string $available
     ) {
         parent::__construct(
             "Insufficient balance. Required: {$required}, Available: {$available}"

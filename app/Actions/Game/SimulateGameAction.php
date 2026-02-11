@@ -8,17 +8,18 @@ class SimulateGameAction
 {
     private const int WIN_PROBABILITY = 40;
 
-    private const float WIN_MULTIPLIER = 1.5;
+    private const string WIN_MULTIPLIER = '1.5';
 
     /**
-     * @return array<string, bool|float>
+     * @param  numeric-string  $betAmount
+     * @return array{win: bool, amount: numeric-string}
      */
-    public function execute(float $betAmount): array
+    public function execute(string $betAmount): array
     {
         $isWin = random_int(1, 100) <= self::WIN_PROBABILITY;
 
         if ($isWin) {
-            $winnings = $betAmount * self::WIN_MULTIPLIER;
+            $winnings = bcmul($betAmount, self::WIN_MULTIPLIER, 4);
 
             return [
                 'win' => true,
@@ -28,7 +29,7 @@ class SimulateGameAction
 
         return [
             'win' => false,
-            'amount' => 0.00,
+            'amount' => '0.0000',
         ];
     }
 }

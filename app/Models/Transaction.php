@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Enums\TransactionType;
 use Database\Factories\TransactionFactory;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -28,6 +29,7 @@ class Transaction extends Model
     protected function casts(): array
     {
         return [
+            'type' => TransactionType::class,
             'amount' => 'decimal:4',
             'balance_after' => 'decimal:4',
         ];
@@ -46,7 +48,7 @@ class Transaction extends Model
      */
     public function scopeBets(Builder $query): void
     {
-        $query->where('type', 'bet');
+        $query->where('type', TransactionType::Bet);
     }
 
     /**
@@ -54,7 +56,7 @@ class Transaction extends Model
      */
     public function scopeWins(Builder $query): void
     {
-        $query->where('type', 'win');
+        $query->where('type', TransactionType::Win);
     }
 
     /**

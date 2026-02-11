@@ -17,6 +17,6 @@ class BetWon
 
     public function __construct(
         public readonly Transaction $transaction,
-        public readonly float $winAmount,
+        public readonly string $winAmount,
     ) {}
 }
