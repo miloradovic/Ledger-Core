@@ -80,6 +80,7 @@ services:
       DB_HOST: mysql
       DB_PORT: 3306
       SERVER_NAME: ":80"
+      SANCTUM_STATEFUL_DOMAINS: "localhost,localhost:3000,127.0.0.1,127.0.0.1:8000,app,app:80,ledger-core-app,ledger-core-app:80"
       # Composer settings for Docker
       COMPOSER_ALLOW_SUPERUSER: 1
       COMPOSER_PROCESS_TIMEOUT: 600
@@ -183,6 +184,31 @@ services:
     security_opt:
       - no-new-privileges:true
     
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "5m"
+        max-file: "2"
+
+  # ---------------------------------------------------------------------------
+  # k6 Load Testing Service (on-demand via --profile benchmark)
+  # ---------------------------------------------------------------------------
+  k6:
+    image: grafana/k6:latest
+    container_name: ledger-core-k6
+    working_dir: /scripts
+    volumes:
+      - ./k6:/scripts:ro
+    networks:
+      - ledger-network
+    depends_on:
+      app:
+        condition: service_healthy
+    environment:
+      BASE_URL: "http://app:80"
+    profiles: ["benchmark"]
+    security_opt:
+      - no-new-privileges:true
     logging:
       driver: "json-file"
       options:
