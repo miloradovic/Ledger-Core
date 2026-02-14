@@ -44,10 +44,8 @@ WORKDIR /app
 # -----------------------------------------------------------------------------
 FROM base AS composer-deps
 
-# Install Composer from official image
 COPY --from=composer:2.9 /usr/bin/composer /usr/bin/composer
 
-# Copy only dependency files first (better caching)
 COPY composer.json composer.lock ./
 
 # Install dependencies with optimal flags and cache mounting
@@ -68,7 +66,8 @@ FROM node:24-alpine AS node-builder
 
 WORKDIR /app
 
-# Copy package files
+RUN npm install -g npm@latest
+
 COPY package.json package-lock.json ./
 
 # Install node dependencies with cache
@@ -164,6 +163,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     vim \
     && curl -fsSL https://deb.nodesource.com/setup_24.x | bash - \
     && apt-get install -y --no-install-recommends nodejs \
+    && npm install -g npm@latest \
     && docker-php-ext-install -j$(nproc) pdo_mysql zip bcmath mbstring exif pcntl intl opcache \
     && pecl install xdebug-3.4.0 \
     && docker-php-ext-enable xdebug \
