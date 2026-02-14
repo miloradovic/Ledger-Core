@@ -1,296 +1,114 @@
-# Ledger Core - Casino Game Platform
+# Ledger Core
 
-**Small showcase of a casino game ledger system built with Laravel, solving critical challenges in financial transaction processing, concurrent betting, and regulatory compliance.**
+A casino game ledger built with **Laravel 12** and **PHP 8.4**. It's a small project I put together to tackle the kinds of problems you'd actually hit building financial systems — race conditions, decimal precision, audit trails, that sort of thing.
 
-## Project Overview
+Not a production casino. Just a focused demo of how I'd approach the hard parts.
 
-Ledger Core is a sophisticated casino game platform that addresses the core technical challenges faced in iGaming financial systems:
+## What's in here
 
-### Key Problems Solved
+Four API endpoints behind Sanctum auth — spin, deposit, balance, and transaction history. The interesting stuff is under the hood.
 
-1. **Concurrent Betting Race Conditions**
-   - Multiple users placing bets simultaneously on the same account
-   - Potential for negative balances and financial discrepancies
-   - Need for atomic, thread-safe financial operations
+### The good bits
 
-2. **Financial Precision and Accuracy**
-   - Requirement for exact decimal calculations in betting scenarios
-   - Prevention of rounding errors in win/loss calculations
-   - Comprehensive audit trails for regulatory compliance
+- **Pessimistic locking** — every bet and deposit locks the user row with `lockForUpdate()` inside a DB transaction. No race conditions, no negative balances, no "oops we paid out twice" situations.
+- **bcmath everywhere** — all money math uses `bcadd`, `bcsub`, `bcmul`, `bccomp` with 4 decimal places. No floating-point surprises.
+- **DB-level safety net** — a `CHECK (balance >= 0)` constraint on the users table. Even if the app logic somehow fails, the database won't let a balance go negative.
+- **Full audit trail** — every transaction gets logged with `balance_after`, plus a `TransactionObserver` that writes to a dedicated log channel with IP and session info.
+- **Performance indexes** — composite indexes on `(user_id, created_at)`, `(user_id, type, created_at)`, and `(user_id, balance_after)` for the queries that actually get hit.
 
-3. **Transaction Integrity**
-   - Ensuring all financial operations are logged and traceable
-   - Maintaining data consistency across high-volume operations
-   - Providing real-time balance updates without race conditions
+### Quality gates
 
-4. **Regulatory Compliance**
-   - Complete transaction history for auditing
-   - Balance tracking with before/after states
-   - Secure API endpoints with proper authentication
+GrumPHP runs on every commit:
+- **PHPStan level 8** (with Larastan)
+- **Pint** for code style
+- **Pest** for tests
 
-### Solution Highlights
+## k6 Load Test Results
 
-- **Atomic Database Transactions**: All financial operations wrapped in ACID-compliant transactions
-- **Optimistic Locking**: Uses Laravel's `lockForUpdate()` to prevent race conditions
-- **Decimal Precision**: 4 decimal place accuracy for all financial calculations
-- **Comprehensive Logging**: Every transaction recorded with before/after balance states
-- **RESTful API**: Secure endpoints for all gaming operations
-- **Automated Testing**: Full test coverage including concurrency scenarios
+All benchmarks run inside Docker (FrankenPHP + MySQL 8.4), 10 virtual users, default 30s duration.
 
-## Core Features
+### Spin (POST /api/spin) — write-heavy
 
-## Table of Contents
+The main endpoint. Each spin does: auth check → lock row → validate balance → create bet transaction → RNG → maybe create win transaction → unlock.
 
-- [Core Features](#core-features)
-- [Architecture](#architecture)
-- [API Endpoints](#api-endpoints)
-- [Testing](#testing)
-- [Project Structure](#project-structure)
-- [License](#license)
+| Metric | Value |
+|---|---|
+| p95 response time | **161ms** |
+| p99 response time | **577ms** |
+| Success rate | **100%** |
+| Failed requests | **0%** |
+| Avg spin duration | **124ms** |
+| Throughput | **~15 req/s** |
+| All thresholds | **passed** |
 
-## Core Features
+### Balance (GET /api/balance) — read-heavy
 
-### Wallet System
-- Real-time balance tracking with atomic operations
-- Secure deposit functionality with configurable limits ($0.01 - $10000)
-- Decimal precision support (4 decimal places)
-- Automatic transaction logging for all wallet operations
+Simple authenticated balance lookup.
 
-### Concurrent Betting
-- Optimistic concurrency control using database locking (`lockForUpdate()`)
-- Atomic transactions to ensure data consistency
-- Prevents race conditions when placing bets simultaneously
-- Insufficient balance check before processing bets
+| Metric | Value |
+|---|---|
+| p95 response time | **134ms** |
+| p99 response time | **253ms** |
+| Success rate | **99.92%** |
+| Failed requests | **0.04%** |
+| Avg balance duration | **110ms** |
+| Throughput | **~31 req/s** |
+| All thresholds | **passed** |
 
-### Transaction History
-- Complete financial transaction logging
-- Supports multiple transaction types: `bet`, `win`, `deposit`, `withdraw`
-- Balance after transaction tracking for audit purposes
-- API endpoint for retrieving transaction history (last 50 transactions)
+> Run them yourself: `docker compose --profile benchmark run --rm k6 run /scripts/scenarios/spin.js`
 
-## Architecture
+## Tech stack
 
-### Core Models
+- **Laravel 12** / **PHP 8.4** with strict types
+- **FrankenPHP** as the app server
+- **MySQL 8.4** with InnoDB row-level locking
+- **Redis 7.4** for caching/sessions
+- **Laravel Sanctum** for SPA authentication
+- **Pest** for testing, **Larastan** (PHPStan L8) for static analysis
+- **k6** for load testing, containerized alongside the app
+- **Docker Compose** for the full stack
 
-1. **User**: Represents a registered user with balance tracking
-   - `id`, `name`, `email`, `password`, `balance`, `email_verified_at`
-   - Relationships: `hasMany(Transaction)`
-   - Balance stored as decimal with 4 decimal places precision
-
-2. **Game**: Represents a casino game with bet limits
-   - `id`, `name`, `min_bet`, `max_bet`
-
-3. **Transaction**: Records all financial transactions
-   - `id`, `user_id`, `type`, `amount`, `balance_after`
-   - Types: `bet`, `win`, `deposit`, `withdraw`
-   - Relationships: `belongsTo(User)`
-
-### Key Actions
-
-1. **PlaceBetAction**: Handles bet placement with atomic database transactions
-   - Lock user record for update to prevent race conditions
-   - Check balance before processing bet
-   - Create bet transaction
-   - Simulate game outcome
-   - Process winnings if bet is successful
-   - Create win transaction
-   - Return updated balance and results
-
-2. **DepositAction**: Manages user deposits
-   - Add funds to user's wallet
-   - Create deposit transaction
-   - Return updated balance
-
-3. **SimulateGameAction**: Simulates casino game outcomes
-   - 40% win probability with 1.5x multiplier
-   - Randomized outcome generation
-   - Returns win status and amount
-
-### Controllers
-
-1. **GameController**: API endpoints for game operations
-   - `spin()`: Place a bet (requires `bet_amount`)
-   - `deposit()`: Deposit funds (requires `amount`)
-   - `balance()`: Get current user balance
-   - `transactions()`: Get transaction history (latest 50)
-
-## API Endpoints
-
-All endpoints are protected by Laravel Sanctum authentication.
-
-### Game Operations
-- `POST /api/spin`: Place a bet
-  - Body: `{ "bet_amount": 10.00 }`
-  - Response: `{ "success": true, "data": { "win": true, "winnings": 15.00, "new_balance": 105.00 } }`
-
-- `POST /api/deposit`: Deposit funds
-  - Body: `{ "amount": 50.00 }`
-  - Response: `{ "success": true, "data": { "balance": 150.00 } }`
-
-- `GET /api/balance`: Get current balance
-  - Response: `{ "success": true, "balance": 150.00 }`
-
-- `GET /api/transactions`: Get transaction history
-  - Response: `{ "success": true, "transactions": [ ... ] }`
-
-## Testing
-
-The application includes comprehensive tests for all critical functionality, with special focus on financial integrity and concurrency scenarios:
-
-### Key Test Coverage
-
-1. **ConcurrencyTest**: Ensures race condition prevention
-   - Tests multiple simultaneous bets on the same account
-   - Verifies balance never goes negative
-   - Confirms proper handling of insufficient funds scenarios
-   - Validates transaction logging under concurrent load
-
-2. **PlaceBetTest**: Validates core betting functionality
-   - Bet placement and balance deduction
-   - Win processing and balance updates
-   - Transaction history accuracy
-   - Edge cases and error conditions
-
-3. **Financial Integrity Tests**:
-   - Atomic transaction verification
-   - Balance consistency checks
-   - Audit trail completeness
-   - Decimal precision validation
-
-### Key Code Examples
-
-#### 1. Atomic Bet Processing with Race Condition Prevention
-
-The core bet placement logic in [`PlaceBetAction.php`](app/Actions/Wallet/PlaceBetAction.php) demonstrates how we solve concurrent betting challenges:
-
-```php
-public function execute(User $user, float $betAmount): array
-{
-    return DB::transaction(function () use ($user, $betAmount): array {
-        // Lock the user record to prevent race conditions
-        $user = User::where('id', $user->id)->lockForUpdate()->first();
-        
-        // Validate sufficient balance
-        if ($user->balance < $betAmount) {
-            throw new Exception('Insufficient balance');
-        }
-        
-        // Atomic balance update
-        $user->balance -= $betAmount;
-        $user->save();
-        
-        // Create audit trail transaction
-        Transaction::create([
-            'user_id' => $user->id,
-            'type' => 'bet',
-            'amount' => -$betAmount,
-            'balance_after' => $user->balance
-        ]);
-        
-        // Process game outcome and potential winnings
-        // ...
-    });
-}
-```
-
-#### 2. Concurrent Testing Implementation
-
-The [`ConcurrencyTest.php`](tests/Feature/ConcurrencyTest.php) shows how we validate race condition prevention:
-
-```php
-public function test_concurrent_bets_are_handled_correctly(): void
-{
-    $user = User::factory()->create(['balance' => 100.00]);
-    
-    // Simulate 5 concurrent bet requests
-    $responses = [];
-    for ($i = 0; $i < 5; $i++) {
-        $responses[] = $this->actingAs($user)
-            ->postJson('/api/spin', ['bet_amount' => 10.00]);
-    }
-    
-    // Verify all requests completed successfully
-    foreach ($responses as $response) {
-        $response->assertSuccessful();
-    }
-    
-    // Ensure balance integrity (never exceeds initial balance)
-    $user->refresh();
-    $this->assertLessThanOrEqual(100.00, $user->balance);
-    
-    // Confirm proper transaction logging
-    $this->assertGreaterThanOrEqual(5, DB::table('transactions')
-        ->where('user_id', $user->id)->count());
-}
-```
-
-#### 3. Secure Deposit Processing
-
-The [`DepositAction.php`](app/Actions/Wallet/DepositAction.php) shows atomic deposit handling:
-
-```php
-public function execute(User $user, float $amount): array
-{
-    return DB::transaction(function () use ($user, $amount): array {
-        // Lock user record for atomic update
-        $user = User::where('id', $user->id)->lockForUpdate()->first();
-        
-        // Atomic balance update
-        $user->balance += $amount;
-        $user->save();
-        
-        // Create complete audit trail
-        Transaction::create([
-            'user_id' => $user->id,
-            'type' => 'deposit',
-            'amount' => $amount,
-            'balance_after' => $user->balance
-        ]);
-        
-        return ['success' => true, 'new_balance' => $user->balance];
-    });
-}
-```
-
-### Run Tests
+## Running it
 
 ```bash
-php artisan test
+cp .env.example .env
+docker compose up -d
+docker compose exec app composer setup
 ```
 
-The test suite includes:
-- Unit tests for all core models and actions
-- Feature tests for API endpoints and workflows
-- Concurrency tests for race condition prevention
-- Edge case testing for financial operations
-- Integration tests for complete user journeys
+Tests:
+```bash
+docker compose exec app php artisan test
+```
 
-## Project Structure
+Load tests:
+```bash
+docker compose --profile benchmark run --rm k6 run /scripts/scenarios/spin.js
+docker compose --profile benchmark run --rm k6 run /scripts/scenarios/balance-checks.js
+docker compose --profile benchmark run --rm k6 run /scripts/scenarios/mixed-realistic.js
+```
+
+## Project layout
 
 ```
-Ledger-Core/
-├── app/
-│   ├── Actions/
-│   │   ├── Game/
-│   │   │   └── SimulateGameAction.php
-│   │   └── Wallet/
-│   │       ├── DepositAction.php
-│   │       └── PlaceBetAction.php
-│   ├── Http/
-│   │   └── Controllers/
-│   │       ├── GameController.php
-│   │       └── ProfileController.php
-│   └── Models/
-│       ├── Game.php
-│       ├── Transaction.php
-│       └── User.php
-├── database/
-│   ├── factories/
-│   ├── migrations/
-│   └── seeders/
-└── tests/
-    └── Feature/
-        ├── ConcurrencyTest.php
-        └── PlaceBetTest.php
+app/
+├── Actions/
+│   ├── Game/SimulateGameAction.php      # 40% win chance, 1.5x multiplier
+│   └── Wallet/
+│       ├── PlaceBetAction.php           # lock → validate → bet → RNG → win
+│       └── DepositAction.php            # lock → add funds → log
+├── Observers/TransactionObserver.php    # audit logging on every transaction
+├── Exceptions/InsufficientBalanceException.php
+└── Models/  (User, Game, Transaction)
+
+tests/Feature/
+├── ConcurrencyTest.php                  # race condition scenarios
+├── PlaceBetTest.php                     # core betting flow
+└── WalletIntegrityTest.php              # balance never negative, math checks
+
+k6/scenarios/
+├── spin.js                              # write-heavy load test
+├── balance-checks.js                    # read-heavy load test
+└── mixed-realistic.js                   # 50% spins, 30% balance, 20% deposits
 ```
 
